@@ -7,6 +7,8 @@ from django.views.generic import TemplateView
 from app.models import Person
 from django.shortcuts import render, redirect
 from .forms import PersonForm
+from django.views.generic.edit import CreateView, UpdateView
+from django.urls import reverse_lazy
 
 # View 1 - Hello World (FBV)
 def hello_view(request):
@@ -35,9 +37,9 @@ class ServerInfoView(View):
         })
 
 class WelcomeView(TemplateView):
-    template_name = "app/welcome.html" #<project_root>/templates/app/welcome.html
+    template_name = "app/welcome.html" 
 
-    def get_context_data(self, **kwargs): #sobreescrita
+    def get_context_data(self, **kwargs): 
         context = super().get_context_data(**kwargs)
         context['name'] = self.request.GET.get('name', 'Visitante')
         return context
@@ -51,15 +53,14 @@ class PeopleView(View):
         data = [{'name': p.name, 'age': p.age, 'gender': p.gender} for p in people]
         return JsonResponse({'people': data})
 
+class PersonCreateView(CreateView):
+    model = Person
+    form_class = PersonForm
+    template_name = 'app/person_form.html'
+    success_url = reverse_lazy('person_list')
 
-class PersonCreateView(View):
-    def get(self, request):
-        form = PersonForm()
-        return render(request, 'app/person_form.html', {'form': form})
-
-    def post(self, request):
-        form = PersonForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('/people/')
-        return render(request, 'app/person_form.html', {'form': form})
+class PersonUpdateView(UpdateView):
+    model = Person
+    form_class = PersonForm
+    template_name = 'app/person_form.html'
+    success_url = reverse_lazy('person_list')

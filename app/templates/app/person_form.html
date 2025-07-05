@@ -1,7 +1,20 @@
-<h2>Cadastro de Pessoa</h2>
+<h2>{{ view.object.pk|yesno:"Editar Pessoa,Cadastrar Pessoa" }}</h2>
 
 <form method="post">
   {% csrf_token %}
-  {{ form.as_p }}
+
+  {% for field in form %}
+    <div style="margin-bottom: 15px;">
+      <label for="{{ field.id_for_label }}"><strong>{{ field.label }}</strong></label><br>
+      {{ field }}
+      
+      {% if field.errors %}
+        <div style="color: red;">
+          {{ field.errors|striptags }}
+        </div>
+      {% endif %}
+    </div>
+  {% endfor %}
+
   <button type="submit">Salvar</button>
 </form>
